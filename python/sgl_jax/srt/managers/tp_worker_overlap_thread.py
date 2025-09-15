@@ -37,6 +37,12 @@ def resolve_future_token_ids(input_ids, future_token_ids_map):
     #     future_token_ids_map[jnp.clip(-input_ids, 0, max_idx)],
     #     input_ids,
     # )
+    ret = jnp
+    for idx, input_id in enumerate(input_ids):
+        if input_id < 0:
+            jax.debug.print(
+                future_token_ids_map[min(-input_id, future_token_ids_map.shape[0] - 1)]
+            )
     return input_ids
 
 
