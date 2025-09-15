@@ -234,6 +234,41 @@ class ForwardBatch:
         batch: ModelWorkerBatch,
         model_runner: ModelRunner,
     ):
+        # Debug: Print batch data shapes and sums before device_array
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        try:
+            import jax.numpy as jnp
+
+            logger.info(f"=== DEBUG BATCH DATA ===")
+
+            def log_data(name, data):
+                if data is None:
+                    logger.info(f"{name}: None")
+                else:
+                    # Limit data output to prevent log overflow
+                    data_preview = (
+                        str(data)[:200] + "..." if len(str(data)) > 200 else str(data)
+                    )
+                    logger.info(
+                        f"{name} shape: {data.shape}, sum: {jnp.sum(data)}, data: {data_preview}"
+                    )
+
+            log_data("input_ids", batch.input_ids)
+            log_data("seq_lens", batch.seq_lens)
+            log_data("out_cache_loc", batch.out_cache_loc)
+            log_data("positions", batch.positions)
+            log_data("extend_start_loc", batch.extend_start_loc)
+            log_data("req_pool_indices", batch.req_pool_indices)
+            log_data("cache_loc", batch.cache_loc)
+            log_data("extend_prefix_lens", batch.extend_prefix_lens)
+            log_data("extend_seq_lens", batch.extend_seq_lens)
+            logger.info(f"========================")
+        except Exception as e:
+            logger.error(f"Debug logging failed: {e}")
+
         (
             input_ids,
             seq_lens,
