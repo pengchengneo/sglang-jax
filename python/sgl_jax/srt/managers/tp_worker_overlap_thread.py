@@ -131,6 +131,7 @@ class ModelWorkerClient:
             model_worker_batch.forward_batch.input_ids = resolve_future_token_ids(
                 input_ids, self.future_token_ids_map
             )
+            jax.experimental.multihost_utils.sync_global_devices("start forward")
             logger.info(f"start forward")
             # Run forward
             logits_output, next_token_ids, cache_miss_count = (
