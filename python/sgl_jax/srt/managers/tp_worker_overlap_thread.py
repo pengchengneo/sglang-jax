@@ -24,7 +24,7 @@ from sgl_jax.utils import get_exception_traceback
 logger = logging.getLogger(__name__)
 
 
-@jax.jit
+# @jax.jit
 def resolve_future_token_ids(input_ids, future_token_ids_map):
     max_idx = future_token_ids_map.shape[0] - 1
     return jnp.where(
