@@ -31,12 +31,13 @@ def resolve_future_token_ids(input_ids, future_token_ids_map):
     #     "future_token_ids_map {future_token_ids_map}",
     #     future_token_ids_map=future_token_ids_map,
     # )
-    max_idx = future_token_ids_map.shape[0] - 1
-    return jnp.where(
-        input_ids < 0,
-        future_token_ids_map[jnp.clip(-input_ids, 0, max_idx)],
-        input_ids,
-    )
+    # max_idx = future_token_ids_map.shape[0] - 1
+    # return jnp.where(
+    #     input_ids < 0,
+    #     future_token_ids_map[jnp.clip(-input_ids, 0, max_idx)],
+    #     input_ids,
+    # )
+    return input_ids
 
 
 @jax.jit
