@@ -199,9 +199,7 @@ class Scheduler(
             jax.distributed.initialize(
                 server_args.dist_init_addr, self.nnodes, self.node_rank
             )
-            debug_options = jax.lib.xla_client.DebugOptions()
-            debug_options.xla_dump_hlo_as_text = True
-            debug_options.xla_dump_hlo_as_proto = True
+
         self.mesh = create_device_mesh(
             ici_parallelism=[-1, self.tp_size, 1], dcn_parallelism=[1, 1, 1]
         )
