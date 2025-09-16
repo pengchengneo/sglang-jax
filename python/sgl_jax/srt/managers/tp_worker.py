@@ -43,6 +43,7 @@ class ModelWorker:
         self,
         server_args: ServerArgs,
         mesh: jax.sharding.Mesh,
+        is_draft_worker: bool = False,
         req_to_token_pool: Optional[ReqToTokenPool] = None,
     ):
         # Parse args
@@ -78,6 +79,7 @@ class ModelWorker:
             tp_size=server_args.tp_size,
             server_args=server_args,
             mesh=self.mesh,
+            is_draft_worker=is_draft_worker,
             req_to_token_pool=req_to_token_pool,
             rngs=nnx.Rngs(self.random_seed),
         )
