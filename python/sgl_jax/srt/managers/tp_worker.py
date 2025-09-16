@@ -129,7 +129,7 @@ class ModelWorker:
         # Each process may have different random_seed. After broadcast, all processes will have the same random_seed.
         # self.random_seed = broadcast_one_to_all(server_args.random_seed).item()
 
-        # A reference make this class has the same member as TpModelWorkerClient
+        # A reference make this class has the same member as ModelWorkerClient
         self.worker = self
 
         self.max_padded_batch_size, self.max_padded_num_tokens = (
@@ -449,7 +449,7 @@ class MockModelWorker:
             self.max_req_len > 0 and self.max_req_input_len > 0
         ), "Memory pool size is too small"
 
-        # A reference make this class has the same member as TpModelWorkerClient
+        # A reference make this class has the same member as ModelWorkerClient
         self.worker = self
 
     def get_worker_info(self):
