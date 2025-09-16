@@ -129,6 +129,13 @@ class ServerArgs:
 
     disable_jax_precompile: bool = False
 
+    # Speculative decoding
+    speculative_algorithm: Optional[str] = None
+    speculative_draft_model_path: Optional[str] = None
+    speculative_num_steps: int = 4
+    speculative_eagle_topk: int = 5
+    speculative_num_draft_tokens: int = 4
+
     def __post_init__(self):
         # Set missing default values
         if self.tokenizer_path is None:
@@ -748,6 +755,40 @@ class ServerArgs:
             ],
             default=ServerArgs.attention_backend,
             help="Choose the kernels for attention layers.",
+        )
+
+        # Speculative decoding
+        parser.add_argument(
+            "--speculative-algorithm",
+            type=str,
+            choices=["EAGLE", "EAGLE3", "NEXTN", "STANDALONE"],
+            help="Speculative algorithm.",
+            default=ServerArgs.speculative_algorithm,
+        )
+        parser.add_argument(
+            "--speculative-draft-model-path",
+            "--speculative-draft-model",
+            type=str,
+            help="The path of the draft model weights. This can be a local folder or a Hugging Face repo ID.",
+            default=ServerArgs.speculative_draft_model_path,
+        )
+        parser.add_argument(
+            "--speculative-num-steps",
+            type=int,
+            help="The number of steps sampled from draft model in Speculative Decoding.",
+            default=ServerArgs.speculative_num_steps,
+        )
+        parser.add_argument(
+            "--speculative-eagle-topk",
+            type=int,
+            help="The number of tokens sampled from the draft model in eagle2 each step.",
+            default=ServerArgs.speculative_eagle_topk,
+        )
+        parser.add_argument(
+            "--speculative-num-draft-tokens",
+            type=int,
+            help="The number of tokens sampled from the draft model in Speculative Decoding.",
+            default=ServerArgs.speculative_num_draft_tokens,
         )
 
     @classmethod
