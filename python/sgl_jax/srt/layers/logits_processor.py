@@ -229,9 +229,15 @@ class LogitsProcessor(nnx.Module):
         self,
         hidden_states: jax.Array,
         logits_metadata: LogitsMetadata,
+        aux_hidden_states: Optional[jax.Array] = None,
     ) -> LogitsProcessorOutput:
-        if logits_metadata.forward_mode.is_decode_or_idle():
+        if (
+            logits_metadata.forward_mode.is_decode_or_idle()
+            or logits_metadata.forward_mode.is_target_verify()
+        ):
             pruned_states = hidden_states
+            if aux_hidden_states is not None:
+                aux_pruned_states = [hidden for hidden in aux_hidden_states]
             sample_indices = None
             input_logprob_indices = None
         elif (
@@ -240,6 +246,8 @@ class LogitsProcessor(nnx.Module):
         ):
             last_index = jnp.cumsum(logits_metadata.extend_seq_lens, axis=0) - 1
             pruned_states = hidden_states[last_index]
+            if aux_hidden_states is not None:
+                aux_pruned_states = [hidden[last_index] for hidden in aux_hidden_states]
             sample_indices = None
             input_logprob_indices = None
         else:
@@ -299,15 +307,26 @@ class LogitsProcessor(nnx.Module):
         hidden_states_to_store: Optional[jax.Array] = None
         if logits_metadata.capture_hidden_mode.need_capture():
             if logits_metadata.capture_hidden_mode.is_full():
-                hidden_states_to_store = hidden_states
+                if aux_hidden_states is not None:
+                    hidden_states_to_store = jnp.concat(aux_hidden_states, dim=-1)
+                else:
+                    hidden_states_to_store = hidden_states
             elif logits_metadata.capture_hidden_mode.is_last():
                 # Get the last token hidden states. If sample_indices is None,
                 # pruned states only contain the last tokens already.
-                hidden_states_to_store = (
-                    pruned_states[sample_indices]
-                    if sample_indices is not None
-                    else pruned_states
-                )
+                if aux_hidden_states is not None:
+                    aux_pruned_states = jnp.concat(aux_pruned_states, dim=-1)
+                    hidden_states_to_store = (
+                        aux_pruned_states[sample_indices]
+                        if sample_indices is not None
+                        else aux_pruned_states
+                    )
+                else:
+                    hidden_states_to_store = (
+                        pruned_states[sample_indices]
+                        if sample_indices is not None
+                        else pruned_states
+                    )
             else:
                 assert False, "Should never reach"
 
