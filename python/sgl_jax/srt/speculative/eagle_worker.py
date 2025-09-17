@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 import jax
+import numpy as np
 
 from sgl_jax.srt.layers.logits_processor import LogitsMetadata, LogitsProcessorOutput
 from sgl_jax.srt.managers.schedule_batch import ModelWorkerBatch, ScheduleBatch
@@ -58,7 +59,7 @@ class EAGLEWorker(ModelWorker):
 
     def forward_target_extend(
         self, model_worker_batch: ModelWorkerBatch, sample_meta_data: SamplingMetadata
-    ) -> Tuple[LogitsProcessorOutput, jax.Array, int, int, jax.Array]:
+    ) -> Tuple[LogitsProcessorOutput, jax.Array, int, int, np.ndarray]:
         model_worker_batch.capture_hidden_mode = CaptureHiddenMode.FULL
         logits_output, next_token_ids, cache_miss_count = (
             self.target_worker.forward_batch_generation(
@@ -78,19 +79,18 @@ class EAGLEWorker(ModelWorker):
         batch: ScheduleBatch,
         hidden_states: jax.Array,
         next_token_ids: jax.Array,
-        seq_lens_cpu: Optional[jax.Array],
     ):
         batch.spec_info = EagleDraftInput(
             hidden_states=hidden_states,
-            next_token_ids=next_token_ids,
-            seq_lens_cpu=seq_lens_cpu,
+            verified_id=next_token_ids,
+            num_tokens_per_batch=1,
+            num_tokens_for_logprob_per_batch=1,
         )
         batch.return_hidden_states = False
         batch.spec_info.prepare_for_extend(batch)
         batch.spec_info.capture_hidden_mode = CaptureHiddenMode.LAST
-        model_worker_batch = batch.get_model_worker_batch(
-            seq_lens_cpu_cache=seq_lens_cpu
-        )
+        #  this place we shift the input_ids, so we need re-get the model_worker_batch
+        model_worker_batch = batch.get_model_worker_batch()
         forward_batch = ForwardBatch.init_new(
             model_worker_batch, self.draft_model_runner
         )
