@@ -40,6 +40,11 @@ from sgl_jax.srt.precision_tracer import (
 from sgl_jax.srt.sampling.sampling_batch_info import SamplingBatchInfo
 from sgl_jax.srt.sampling.sampling_params import SamplingParams
 from sgl_jax.srt.server_args import ServerArgs
+from sgl_jax.srt.speculative.spec_info import (
+    EagleDraftInput,
+    EagleVerifyInput,
+    SpeculativeAlgorithm,
+)
 
 INIT_INCREMENTAL_DETOKENIZATION_OFFSET = 5
 
@@ -477,6 +482,9 @@ class ScheduleBatch:
     mesh: mesh_lib.Mesh = None
 
     cache_miss_count: int = 0
+
+    spec_algorithm: SpeculativeAlgorithm = None
+    spec_info: Optional[Union[EagleDraftInput, EagleVerifyInput]] = None
 
     # Whether to return hidden states
     return_hidden_states: bool = False
@@ -1361,6 +1369,10 @@ class ModelWorkerBatch:
 
     # Pre-initialized ForwardBatch for overlap scheduling optimization
     forward_batch: Optional[Any] = None
+
+    spec_info: Optional[Union[EagleDraftInput, EagleVerifyInput]] = None
+    spec_algorithm: SpeculativeAlgorithm = None
+    capture_hidden_mode: CaptureHiddenMode = None
 
 
 def get_last_loc(

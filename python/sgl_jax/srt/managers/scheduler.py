@@ -323,11 +323,6 @@ class Scheduler(
             self.tp_worker.run_precompile()
             logger.info(f"[Scheduler] Completes worker precompile.")
 
-        if self.spec_algorithm.is_none():
-            self.forward_func = self.tp_worker.forward_batch_generation
-        else:
-            self.forward_func = self.draft_worker.forward_batch_speculative_generation
-
     def sync_pub(self):
         logger.info(
             f"[Publisher {self.node_rank}] Begins to synchronize, wait {self.nnodes-1} Subscribers"
@@ -940,15 +935,20 @@ class Scheduler(
             model_worker_batch.forward_batch = ForwardBatch.init_new(
                 model_worker_batch, self.tp_worker.get_model_runner()
             )
-            logits_output, next_token_ids, cache_miss_count = self.forward_func(
-                model_worker_batch, sampling_metadata=sampling_metadata
+        if self.spec_algorithm.is_none():
+            logits_output, next_token_ids, cache_miss_count = (
+                self.tp_worker.forward_batch_generation(
+                    model_worker_batch, sampling_metadata=sampling_metadata
+                )
             )
+        else:
+            self.draft_worker.forward_batch_speculative_generation(
+                batch, model_worker_batch
+            )
+        if self.enable_overlap:
             next_token_ids = next_token_ids[: model_worker_batch.real_bs]
         else:
-            logits_output, next_token_ids_device, cache_miss_count = self.forward_func(
-                model_worker_batch, sampling_metadata=sampling_metadata
-            )
-            next_token_ids = np.array(jax.device_get(next_token_ids_device))[
+            next_token_ids = np.array(jax.device_get(next_token_ids))[
                 : model_worker_batch.real_bs
             ]
 
