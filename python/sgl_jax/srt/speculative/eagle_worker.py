@@ -21,7 +21,18 @@ logger = logging.getLogger(__name__)
 class EAGLEWorker(ModelWorker):
     def __init__(self, server_args, target_worker: ModelWorker):
         self.target_worker = target_worker
-        pass
+        self.speculative_num_steps = server_args.speculative_num_steps
+        self.speculative_num_draft_tokens = server_args.speculative_num_draft_tokens
+        self.page_size = server_args.page_size
+        self.speculative_algorithm = SpeculativeAlgorithm.from_string(
+            server_args.speculative_algorithm
+        )
+        self.req_to_token_pool, self.token_to_kv_pool_allocator = (
+            target_worker.get_memory_pool()
+        )
+        super().__init__(server_args, target_worker.mesh, True, self.req_to_token_pool)
+
+        embed, head = self.target_worker.model_runner.model.get_embed_and_head()
 
     def forward_batch_speculative_generation(
         self,
