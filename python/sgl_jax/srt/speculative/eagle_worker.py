@@ -11,11 +11,8 @@ from sgl_jax.srt.model_executor.forward_batch_info import (
     ForwardBatch,
 )
 from sgl_jax.srt.sampling.sampling_batch_info import SamplingMetadata
-from sgl_jax.srt.speculative.spec_info import (
-    EagleDraftInput,
-    EagleVerifyInput,
-    SpeculativeAlgorithm,
-)
+from sgl_jax.srt.speculative.eagle_util import EagleDraftInput, EagleVerifyInput
+from sgl_jax.srt.speculative.spec_info import SpeculativeAlgorithm
 
 
 class EAGLEWorker(ModelWorker):

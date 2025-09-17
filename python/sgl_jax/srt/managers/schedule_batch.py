@@ -40,11 +40,8 @@ from sgl_jax.srt.precision_tracer import (
 from sgl_jax.srt.sampling.sampling_batch_info import SamplingBatchInfo
 from sgl_jax.srt.sampling.sampling_params import SamplingParams
 from sgl_jax.srt.server_args import ServerArgs
-from sgl_jax.srt.speculative.spec_info import (
-    EagleDraftInput,
-    EagleVerifyInput,
-    SpeculativeAlgorithm,
-)
+from sgl_jax.srt.speculative.eagle_util import EagleDraftInput, EagleVerifyInput
+from sgl_jax.srt.speculative.spec_info import SpeculativeAlgorithm
 
 INIT_INCREMENTAL_DETOKENIZATION_OFFSET = 5
 
