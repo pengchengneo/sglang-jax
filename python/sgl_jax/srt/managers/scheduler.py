@@ -943,7 +943,7 @@ class Scheduler(
             )
         else:
             self.draft_worker.forward_batch_speculative_generation(
-                batch, model_worker_batch
+                batch, model_worker_batch, sampling_metadata
             )
         if self.enable_overlap:
             next_token_ids = next_token_ids[: model_worker_batch.real_bs]
