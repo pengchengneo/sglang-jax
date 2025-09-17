@@ -359,7 +359,6 @@ class ModelWorker:
         forward_metadata=None,
     ) -> Tuple[Union[LogitsProcessorOutput, jax.Array, int], Optional[jax.Array]]:
         # Use pre-initialized ForwardBatch if available (for overlap scheduling optimization)
-        logger.info("***********forward_batch_generation***********")
 
         if model_worker_batch.forward_batch is not None:
             forward_batch = model_worker_batch.forward_batch
@@ -380,7 +379,6 @@ class ModelWorker:
                 model_worker_batch, self.mesh
             ),
         )
-        logger.info(f"***********{logits_output} {cache_miss_count}")
         if launch_done is not None:
             launch_done.set()
 

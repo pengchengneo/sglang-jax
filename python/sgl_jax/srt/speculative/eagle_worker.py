@@ -37,12 +37,9 @@ class EAGLEWorker(ModelWorker):
             logits_output, next_token_ids, cache_miss_count, bid, seq_lens = (
                 self.forward_target_extend(model_worker_batch, sample_meta_data)
             )
-            logger.info(
-                f"-------------{logits_output} {next_token_ids} {cache_miss_count} {bid} {seq_lens}"
-            )
             # draft extend for Update Draft State
             self.forward_draft_extend(
-                batch, logits_output.hidden_states, next_token_ids, seq_lens
+                batch, logits_output.hidden_states, next_token_ids
             )
             return logits_output, next_token_ids, cache_miss_count
         else:
@@ -69,7 +66,6 @@ class EAGLEWorker(ModelWorker):
                 model_worker_batch, sampling_metadata=sample_meta_data
             )
         )
-        logger.info(f"-------------{logits_output} {next_token_ids} {cache_miss_count}")
         return (
             logits_output,
             next_token_ids,
