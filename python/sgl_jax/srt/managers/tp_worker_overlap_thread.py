@@ -180,6 +180,7 @@ class ModelWorkerClient:
         sampling_metadata: SamplingMetadata,
     ) -> Tuple[None, jax.Array, int]:
         # Create a new copy of sampling_info because it will be updated in-place by the scheduler for the next batch.
+        logger.info("***********forward_batch_generation***********")
         sampling_info = model_worker_batch.sampling_info
         model_worker_batch.sampling_info = self.cur_sampling_info = dataclasses.replace(
             sampling_info,
