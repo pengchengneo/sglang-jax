@@ -189,6 +189,13 @@ class ServerArgs:
                 )
                 self.chunked_prefill_size = -1
 
+        # Normalize speculative_algorithm: treat empty string as None
+        if (
+            isinstance(self.speculative_algorithm, str)
+            and self.speculative_algorithm.strip() == ""
+        ):
+            self.speculative_algorithm = None
+
     @staticmethod
     def add_cli_args(parser: argparse.ArgumentParser):
         # Model and tokenizer
@@ -826,6 +833,13 @@ class ServerArgs:
             assert (
                 self.chunked_prefill_size % self.page_size == 0
             ), "chunked_prefill_size must be divisible by page_size"
+
+        # Disallow overlap scheduler when speculative decoding is enabled
+        if self.speculative_algorithm is not None and not self.disable_overlap_schedule:
+            raise ValueError(
+                "Speculative decoding does not support overlap scheduler. "
+                "Please pass --disable-overlap-schedule when using --speculative-algorithm."
+            )
 
 
 def prepare_server_args(argv: List[str]) -> ServerArgs:
