@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, Tuple
 
 import jax
@@ -13,6 +14,8 @@ from sgl_jax.srt.model_executor.forward_batch_info import (
 from sgl_jax.srt.sampling.sampling_batch_info import SamplingMetadata
 from sgl_jax.srt.speculative.eagle_util import EagleDraftInput, EagleVerifyInput
 from sgl_jax.srt.speculative.spec_info import SpeculativeAlgorithm
+
+logger = logging.getLogger(__name__)
 
 
 class EAGLEWorker(ModelWorker):
@@ -33,6 +36,9 @@ class EAGLEWorker(ModelWorker):
             # target extend
             logits_output, next_token_ids, cache_miss_count, bid, seq_lens = (
                 self.forward_target_extend(model_worker_batch, sample_meta_data)
+            )
+            logger.info(
+                f"-------------{logits_output} {next_token_ids} {cache_miss_count} {bid} {seq_lens}"
             )
             # draft extend for Update Draft State
             self.forward_draft_extend(
