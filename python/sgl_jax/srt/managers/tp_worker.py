@@ -378,7 +378,7 @@ class ModelWorker:
                 model_worker_batch, self.mesh
             ),
         )
-
+        logger.info(f"***********{logits_output} {cache_miss_count}")
         if launch_done is not None:
             launch_done.set()
 
