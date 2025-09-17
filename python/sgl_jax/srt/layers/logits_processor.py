@@ -1,6 +1,6 @@
 import dataclasses
 from functools import partial
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 import jax
 import jax.nn as nn
@@ -11,9 +11,11 @@ from jax.sharding import Mesh
 from jax.tree_util import register_pytree_node_class
 
 from sgl_jax.srt.layers.embeddings import Embed
-from sgl_jax.srt.managers.schedule_batch import ModelWorkerBatch
 from sgl_jax.srt.model_executor.forward_batch_info import CaptureHiddenMode, ForwardMode
 from sgl_jax.srt.utils.jax_utils import device_array
+
+if TYPE_CHECKING:
+    from sgl_jax.srt.managers.schedule_batch import ModelWorkerBatch
 
 
 @register_pytree_node_class
@@ -90,7 +92,7 @@ class LogitsProcessorOutput:
 
         return obj
 
-    def truncate_logits_processor_output(self, batch: ModelWorkerBatch):
+    def truncate_logits_processor_output(self, batch: "ModelWorkerBatch"):
         # note: here only need to truncate next_token_logits and hidden_states
         self.next_token_logits = jax.lax.dynamic_slice_in_dim(
             self.next_token_logits, 0, batch.real_bs, axis=0
@@ -171,7 +173,7 @@ class LogitsMetadata:
         return obj
 
     @classmethod
-    def from_model_worker_batch(cls, batch: ModelWorkerBatch, mesh: Mesh = None):
+    def from_model_worker_batch(cls, batch: "ModelWorkerBatch", mesh: Mesh = None):
         if batch.forward_mode.is_extend() and batch.return_logprob:
             extend_seq_lens_cpu = batch.extend_seq_lens.tolist()
 
