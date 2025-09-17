@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 from enum import IntEnum, auto
-from typing import Any, List
+from typing import TYPE_CHECKING, Any, List
 
 import jax
 import jax.numpy as jnp
 
 from sgl_jax.srt.layers.logits_processor import LogitsProcessorOutput
-from sgl_jax.srt.managers.schedule_batch import ScheduleBatch
+
+if TYPE_CHECKING:
+    from sgl_jax.srt.managers.schedule_batch import ScheduleBatch
+
 from sgl_jax.srt.model_executor.forward_batch_info import CaptureHiddenMode
 
 
