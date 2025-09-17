@@ -28,17 +28,33 @@ class EAGLEWorker(ModelWorker):
         model_worker_batch: ModelWorkerBatch,
         sample_meta_data: SamplingMetadata,
     ):
+        # prefill : Target Extend -> Decode Extend for Update Draft State
+        # Decode : Draft → Verify → Update Draft State → Draft → Verify → ...
+
         if batch.forward_mode.is_extend():
             # target extend
             logits_output, next_token_ids, cache_miss_count, bid, seq_lens = (
                 self.forward_target_extend(model_worker_batch, sample_meta_data)
             )
-            # draft extend
-            pass
+            # draft extend for Update Draft State
+            self.forward_draft_extend(
+                batch, logits_output.hidden_states, next_token_ids, seq_lens
+            )
+            return logits_output, next_token_ids, cache_miss_count
         else:
             # draft
+            spec_info = self.draft(batch)
             # verify
-            pass
+            logits_output, verify_output, model_worker_batch, cache_hit = self.verify(
+                batch, spec_info
+            )
+            self.forward_draft_extend_after_decode(batch)
+            return (
+                logits_output,
+                next_token_ids,
+                cache_miss_count,
+                sum(verify_output.accept_length_per_req_cpu),
+            )
 
     def forward_target_extend(
         self, model_worker_batch: ModelWorkerBatch, sample_meta_data: SamplingMetadata
@@ -107,3 +123,17 @@ class EAGLEWorker(ModelWorker):
     @property
     def draft_model_runner(self):
         return self.target_worker.get_model_runner()
+
+    def capture_for_decode(
+        self, logits_output: LogitsProcessorOutput, spec_info: EagleDraftInput
+    ):
+        pass
+
+    def draft(self, batch: ScheduleBatch):
+        pass
+
+    def verify(self, batch: ScheduleBatch, spec_info: EagleDraftInput):
+        pass
+
+    def forward_draft_extend_after_decode(self, batch: ScheduleBatch):
+        pass
