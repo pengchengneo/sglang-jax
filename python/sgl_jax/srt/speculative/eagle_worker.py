@@ -16,8 +16,8 @@ from sgl_jax.srt.speculative.spec_info import SpeculativeAlgorithm
 
 
 class EAGLEWorker(ModelWorker):
-    def __init__(self, server_args, targer_worker: ModelWorker):
-        self.target_worker = targer_worker
+    def __init__(self, server_args, target_worker: ModelWorker):
+        self.target_worker = target_worker
         pass
 
     def forward_batch_speculative_generation(
