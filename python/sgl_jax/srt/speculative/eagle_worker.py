@@ -69,6 +69,7 @@ class EAGLEWorker(ModelWorker):
                 model_worker_batch, sampling_metadata=sample_meta_data
             )
         )
+        logger.info(f"-------------{logits_output} {next_token_ids} {cache_miss_count}")
         return (
             logits_output,
             next_token_ids,
