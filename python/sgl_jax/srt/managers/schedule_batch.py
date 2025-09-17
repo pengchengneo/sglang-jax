@@ -20,7 +20,7 @@ import dataclasses
 import logging
 import threading
 from http import HTTPStatus
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union
 
 import numpy as np
 from jax import numpy as jnp
@@ -42,6 +42,9 @@ from sgl_jax.srt.sampling.sampling_params import SamplingParams
 from sgl_jax.srt.server_args import ServerArgs
 from sgl_jax.srt.speculative.eagle_util import EagleDraftInput, EagleVerifyInput
 from sgl_jax.srt.speculative.spec_info import SpeculativeAlgorithm
+
+if TYPE_CHECKING:
+    from sgl_jax.srt.speculative.eagle_util import EagleDraftInput, EagleVerifyInput
 
 INIT_INCREMENTAL_DETOKENIZATION_OFFSET = 5
 
