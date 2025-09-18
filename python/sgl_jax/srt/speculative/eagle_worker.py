@@ -149,7 +149,9 @@ class EAGLEWorker(ModelWorker):
                 model_worker_batch, self.mesh
             ),
         )
-        logger.info(f"-------------after forward-------------{logits_output}")
+        logger.info(
+            f"-------------after forward-------------{logits_output.next_token_logits.shape} {forward_batch.spec_info}"
+        )
         assert isinstance(forward_batch.spec_info, EagleDraftInput)
         assert forward_batch.spec_info is batch.spec_info
         self.capture_for_decode(logits_output, forward_batch.spec_info)
