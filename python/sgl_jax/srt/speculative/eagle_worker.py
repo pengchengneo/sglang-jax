@@ -88,6 +88,9 @@ class EAGLEWorker(ModelWorker):
                 model_worker_batch, sampling_metadata=sample_meta_data
             )
         )
+        logger.info(
+            f"-------------forward_target_extend------------22222-{logits_output.hidden_states.shape} {next_token_ids.shape}"
+        )
         return (
             logits_output,
             next_token_ids,
