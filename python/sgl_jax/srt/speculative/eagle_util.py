@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, List
 
@@ -11,6 +12,8 @@ from sgl_jax.srt.model_executor.forward_batch_info import CaptureHiddenMode
 
 if TYPE_CHECKING:
     from sgl_jax.srt.managers.schedule_batch import ScheduleBatch
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -49,6 +52,9 @@ class EagleDraftInput:
             return
 
         # Prefill only generate 1 token.
+        logger.info(
+            f"-------------prepare_for_extend-------------{self.verified_id} {batch.seq_lens}"
+        )
         assert len(self.verified_id) == len(batch.seq_lens)
 
         pt = 0
