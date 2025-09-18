@@ -63,7 +63,7 @@ class EAGLEWorker(ModelWorker):
             self.forward_draft_extend(
                 batch, model_worker_batch, logits_output.hidden_states, next_token_ids
             )
-            return logits_output, next_token_ids, cache_miss_count
+            return logits_output, next_token_ids, cache_miss_count, 0
         else:
             # draft
             spec_info = self.draft(batch)
