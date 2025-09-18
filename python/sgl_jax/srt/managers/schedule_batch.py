@@ -1252,6 +1252,8 @@ class ScheduleBatch:
             real_bs=real_bs,
             capture_hidden_mode=CaptureHiddenMode.NULL,
             launch_done=self.launch_done,
+            spec_info=self.spec_info,
+            spec_algorithm=self.spec_algorithm,
         )
 
     def _generate_trace_info(self, real_bs: int, bid: int) -> List[str]:
