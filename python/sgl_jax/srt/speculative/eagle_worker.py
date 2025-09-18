@@ -141,7 +141,7 @@ class EAGLEWorker(ModelWorker):
 
     @property
     def draft_model_runner(self):
-        return self.target_worker.get_model_runner()
+        return self.get_model_runner()
 
     def capture_for_decode(
         self, logits_output: LogitsProcessorOutput, spec_info: EagleDraftInput
