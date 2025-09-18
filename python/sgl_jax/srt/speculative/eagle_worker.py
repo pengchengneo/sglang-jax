@@ -37,6 +37,9 @@ class EAGLEWorker(ModelWorker):
         if self.speculative_algorithm.is_eagle3():
             pass
         else:
+            logger.info(
+                f"{self.speculative_algorithm} set target model's embed and head for draft model"
+            )
             self.target_worker.model_runner.model.set_embed_and_head(embed, head)
 
     def forward_batch_speculative_generation(
