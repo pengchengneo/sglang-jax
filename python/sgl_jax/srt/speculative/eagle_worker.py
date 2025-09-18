@@ -34,6 +34,11 @@ class EAGLEWorker(ModelWorker):
 
         embed, head = self.target_worker.model_runner.model.get_embed_and_head()
 
+        if self.speculative_algorithm.is_eagle3():
+            pass
+        else:
+            self.target_worker.model_runner.model.set_embed_and_head(embed, head)
+
     def forward_batch_speculative_generation(
         self,
         batch: ScheduleBatch,
