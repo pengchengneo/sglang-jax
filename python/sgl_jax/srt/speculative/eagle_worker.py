@@ -38,7 +38,7 @@ class EAGLEWorker(ModelWorker):
             pass
         else:
             logger.info(
-                f"{self.speculative_algorithm} set target model's embed and head for draft model"
+                f"{server_args.speculative_algorithm} set target model's embed and head for draft model"
             )
             self.target_worker.model_runner.model.set_embed_and_head(embed, head)
 
@@ -107,6 +107,7 @@ class EAGLEWorker(ModelWorker):
         )
         batch.return_hidden_states = False
         batch.spec_info.prepare_for_extend(batch)
+        logger.info(f"-------------forward_draft_extend-------------")
         batch.spec_info.capture_hidden_mode = CaptureHiddenMode.LAST
         #  this place we shift the input_ids, so we need re-get the model_worker_batch
         model_worker_batch = batch.get_model_worker_batch()
@@ -114,12 +115,15 @@ class EAGLEWorker(ModelWorker):
             model_worker_batch, self.draft_model_runner
         )
         forward_batch.return_logprob = False
+        logger.info(f"-------------after init_new-------------")
+
         logits_output, _ = self.draft_model_runner.forward(
             forward_batch,
             logits_metadata=LogitsMetadata.from_model_worker_batch(
                 model_worker_batch, self.mesh
             ),
         )
+        logger.info(f"-------------after forward-------------{logits_output}")
         assert isinstance(forward_batch.spec_info, EagleDraftInput)
         assert forward_batch.spec_info is batch.spec_info
         self.capture_for_decode(logits_output, forward_batch.spec_info)
