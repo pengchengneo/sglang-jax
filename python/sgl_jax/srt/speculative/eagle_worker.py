@@ -81,7 +81,7 @@ class EAGLEWorker(ModelWorker):
     ) -> Tuple[LogitsProcessorOutput, jax.Array, int, int, np.ndarray]:
         model_worker_batch.capture_hidden_mode = CaptureHiddenMode.FULL
         logger.info(
-            f"-------------forward_target_extend------------11111-{model_worker_batch.seq_lens} {model_worker_batch.input_ids}"
+            f"-------------forward_target_extend------------11111-{model_worker_batch.seq_lens.shape} {model_worker_batch.input_ids.shape}"
         )
         logits_output, next_token_ids, cache_miss_count = (
             self.target_worker.forward_batch_generation(
