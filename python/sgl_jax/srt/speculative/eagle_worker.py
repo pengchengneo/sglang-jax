@@ -61,7 +61,7 @@ class EAGLEWorker(ModelWorker):
             )
             # draft extend for Update Draft State
             self.forward_draft_extend(
-                batch, logits_output.hidden_states, next_token_ids
+                batch, model_worker_batch, logits_output.hidden_states, next_token_ids
             )
             return logits_output, next_token_ids, cache_miss_count
         else:
@@ -84,7 +84,7 @@ class EAGLEWorker(ModelWorker):
     ) -> Tuple[LogitsProcessorOutput, jax.Array, int, int, np.ndarray]:
         model_worker_batch.capture_hidden_mode = CaptureHiddenMode.FULL
         logger.info(
-            f"-------------forward_target_extend------------11111-{model_worker_batch.seq_lens.shape} {model_worker_batch.input_ids.shape}"
+            f"-------------forward_target_extend---{model_worker_batch.real_bs}---------11111-{model_worker_batch.seq_lens.shape} {model_worker_batch.input_ids.shape}"
         )
         logits_output, next_token_ids, cache_miss_count = (
             self.target_worker.forward_batch_generation(
@@ -105,18 +105,19 @@ class EAGLEWorker(ModelWorker):
     def forward_draft_extend(
         self,
         batch: ScheduleBatch,
+        model_worker_batch: ModelWorkerBatch,
         hidden_states: jax.Array,
         next_token_ids: jax.Array,
     ):
         batch.spec_info = EagleDraftInput(
             hidden_states=hidden_states,
-            verified_id=next_token_ids,
+            verified_id=next_token_ids[: model_worker_batch.real_bs],
             num_tokens_per_batch=1,
             num_tokens_for_logprob_per_batch=1,
         )
         batch.return_hidden_states = False
         batch.spec_info.prepare_for_extend(batch)
-        logger.info(f"-------------forward_draft_extend-------------")
+        logger.info(f"-------------forward_draft_extend------------44444444444-")
         batch.spec_info.capture_hidden_mode = CaptureHiddenMode.LAST
         #  this place we shift the input_ids, so we need re-get the model_worker_batch
         model_worker_batch = batch.get_model_worker_batch()
