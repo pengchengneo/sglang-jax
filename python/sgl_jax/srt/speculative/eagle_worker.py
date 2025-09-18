@@ -53,6 +53,9 @@ class EAGLEWorker(ModelWorker):
 
         if batch.forward_mode.is_extend():
             # target extend
+            logger.info(
+                f"-------------forward_target_extend------------33333-{len(batch.reqs)}"
+            )
             logits_output, next_token_ids, cache_miss_count, bid, seq_lens = (
                 self.forward_target_extend(model_worker_batch, sample_meta_data)
             )
