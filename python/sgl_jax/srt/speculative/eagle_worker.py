@@ -137,6 +137,12 @@ class EAGLEWorker(ModelWorker):
         forward_batch.return_logprob = False
         logger.info(f"-------------after init_new-------------")
 
+        # Set forward_metadata for draft_model_runner's attention backend
+        forward_metadata = self.draft_model_runner.attn_backend.get_forward_metadata(
+            model_worker_batch, self.draft_model_runner.mesh
+        )
+        self.draft_model_runner.attn_backend.forward_metadata = forward_metadata
+
         logits_output, _ = self.draft_model_runner.forward(
             forward_batch,
             logits_metadata=LogitsMetadata.from_model_worker_batch(
