@@ -52,9 +52,6 @@ class EagleDraftInput:
             return
 
         # Prefill only generate 1 token.
-        logger.info(
-            f"-------------prepare_for_extend-------------{self.verified_id} {batch.seq_lens}"
-        )
         assert len(self.verified_id) == len(batch.seq_lens)
 
         pt = 0

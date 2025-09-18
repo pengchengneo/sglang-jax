@@ -53,9 +53,6 @@ class EAGLEWorker(ModelWorker):
 
         if batch.forward_mode.is_extend():
             # target extend
-            logger.info(
-                f"-------------forward_target_extend------------33333-{len(batch.reqs)}"
-            )
             logits_output, next_token_ids, cache_miss_count, bid, seq_lens = (
                 self.forward_target_extend(model_worker_batch, sample_meta_data)
             )
@@ -83,16 +80,10 @@ class EAGLEWorker(ModelWorker):
         self, model_worker_batch: ModelWorkerBatch, sample_meta_data: SamplingMetadata
     ) -> Tuple[LogitsProcessorOutput, jax.Array, int, int, np.ndarray]:
         model_worker_batch.capture_hidden_mode = CaptureHiddenMode.FULL
-        logger.info(
-            f"-------------forward_target_extend---{model_worker_batch.real_bs}---------11111-{model_worker_batch.seq_lens.shape} {model_worker_batch.input_ids.shape}"
-        )
         logits_output, next_token_ids, cache_miss_count = (
             self.target_worker.forward_batch_generation(
                 model_worker_batch, sampling_metadata=sample_meta_data
             )
-        )
-        logger.info(
-            f"-------------forward_target_extend------------22222-{logits_output.hidden_states.shape} {next_token_ids.shape}"
         )
         return (
             logits_output,
@@ -117,7 +108,6 @@ class EAGLEWorker(ModelWorker):
         )
         batch.return_hidden_states = False
         batch.spec_info.prepare_for_extend(batch)
-        logger.info(f"-------------forward_draft_extend------------44444444444-")
         batch.spec_info.capture_hidden_mode = CaptureHiddenMode.LAST
         #  this place we shift the input_ids, so we need re-get the model_worker_batch
         (
@@ -135,7 +125,6 @@ class EAGLEWorker(ModelWorker):
             model_worker_batch, self.draft_model_runner
         )
         forward_batch.return_logprob = False
-        logger.info(f"-------------after init_new-------------")
 
         # Set forward_metadata for draft_model_runner's attention backend
         forward_metadata = self.draft_model_runner.attn_backend.get_forward_metadata(
@@ -148,9 +137,6 @@ class EAGLEWorker(ModelWorker):
             logits_metadata=LogitsMetadata.from_model_worker_batch(
                 model_worker_batch, self.mesh
             ),
-        )
-        logger.info(
-            f"-------------after forward-------------{logits_output.next_token_logits.shape} {forward_batch.spec_info}"
         )
         assert isinstance(forward_batch.spec_info, EagleDraftInput)
         assert forward_batch.spec_info is batch.spec_info
