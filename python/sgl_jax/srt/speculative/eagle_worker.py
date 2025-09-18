@@ -120,7 +120,17 @@ class EAGLEWorker(ModelWorker):
         logger.info(f"-------------forward_draft_extend------------44444444444-")
         batch.spec_info.capture_hidden_mode = CaptureHiddenMode.LAST
         #  this place we shift the input_ids, so we need re-get the model_worker_batch
-        model_worker_batch = batch.get_model_worker_batch()
+        (
+            precompile_token_paddings,
+            precompile_bs_paddings,
+            precompile_cache_loc_paddings,
+        ) = self.target_worker.get_precompile_paddings()
+        model_worker_batch = batch.get_model_worker_batch(
+            precompile_token_paddings,
+            precompile_bs_paddings,
+            precompile_cache_loc_paddings,
+            self.page_size,
+        )
         forward_batch = ForwardBatch.init_new(
             model_worker_batch, self.draft_model_runner
         )
