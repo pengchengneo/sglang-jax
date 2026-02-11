@@ -124,10 +124,7 @@ def _smart_nframes(video_config: dict, total_frames: int, video_fps: float) -> i
         nframes = _floor_by_factor(nframes, _QWEN_FRAME_FACTOR)
     if not (_QWEN_FRAME_FACTOR <= nframes <= total_frames):
         raise ValueError(
-            "nframes should in interval [%s, %s], but got %s.",
-            _QWEN_FRAME_FACTOR,
-            total_frames,
-            nframes,
+            f"nframes should in interval [{_QWEN_FRAME_FACTOR}, {total_frames}], but got {nframes}."
         )
     return int(nframes)
 
